@@ -1,5 +1,7 @@
-Case Material Desk v1.2.0
+Case Material Desk v1.4.0
 Built: 2026-06-12
-Mode: Static local-first app with optional free article fetch API
+Mode: Static local-first app with optional free RSS article fetch
 Automation: manual fetch only
 External paid APIs: none
+RSS search: randomized business, industry, operations, and public-info discovery
+Article assist: importance and job-hunting relevance generated locally

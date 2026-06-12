@@ -66,7 +66,7 @@
     }
     .toolbar {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -187,6 +187,22 @@
     .related-item span {
       color: #677477;
       font-size: 12px;
+    }
+    .case-insight {
+      margin-top: 12px;
+      border-top: 1px solid #e8eeeb;
+      padding-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .case-insight p {
+      margin: 0;
+      color: #405155;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .case-insight strong {
+      color: #122324;
     }
     .article-memo {
       margin-top: 12px;
@@ -411,10 +427,9 @@
         <h1>材料登録</h1>
         <p class="lead">無料で読めるニュースや公開情報を中心に、ケース面接で考える材料を集める画面です。</p>
         <div class="toolbar">
-          <select id="source-filter"><option>すべての情報源</option><option>ITmedia</option><option>JETRO</option><option>官公庁</option><option>企業公式</option><option>リーディングカンパニー</option><option>Nikkei</option><option>Reuters</option></select>
+          <select id="source-filter"><option>すべての情報源</option><option>ITmedia</option><option>Google News</option><option>JETRO</option><option>官公庁</option><option>企業公式</option><option>リーディングカンパニー</option><option>Nikkei</option><option>Reuters</option></select>
           <select id="theme-filter"><option>すべてのテーマ</option><option>AI・テクノロジー</option><option>金融・金利・為替</option><option>国際情勢</option><option>メーカー・半導体</option></select>
           <select id="material-filter"><option>すべての材料タイプ</option><option>業界知識</option><option>市場変化</option><option>企業事例</option><option>社会トレンド</option></select>
-          <input id="keyword-filter" placeholder="例: EV、AI、金利">
         </div>
         <div class="summary-row">
           <span class="tag">表示中 <strong id="visible-count">0</strong> 件</span>
@@ -429,7 +444,7 @@
         </div>
         <div class="fetch-bar">
           <button type="button" class="btn primary" id="fetch-free-articles">無料記事を探す</button>
-          <span class="status-msg" id="fetch-status">見つけた無料記事・企業公式資料・公的情報を登録して、ケース面接の材料として育てるアプリです。</span>
+          <span class="status-msg" id="fetch-status">業界・ビジネス・オペレーション・公共情報を中心に、毎回少し違う材料候補を探します。</span>
         </div>
         <form class="manual-form" id="manual-article-form">
           <select id="manual-source">
@@ -598,6 +613,7 @@
             <thead><tr><th>情報源</th><th>種類</th><th>信頼</th><th>用途</th><th>取得</th></tr></thead>
             <tbody>
               <tr><td>ITmedia</td><td>無料ニュース</td><td>A</td><td>IT・AI・通信</td><td><button class="toggle source-toggle on" data-source="ITmedia"></button></td></tr>
+              <tr><td>Google News</td><td>無料RSS検索</td><td>B</td><td>業界・ビジネス・オペレーション記事の発見</td><td><button class="toggle source-toggle on" data-source="Google News"></button></td></tr>
               <tr><td>JETRO</td><td>無料公開情報</td><td>A</td><td>海外ビジネス・貿易</td><td><button class="toggle source-toggle on" data-source="JETRO"></button></td></tr>
               <tr><td>官公庁</td><td>無料公開情報</td><td>A</td><td>政策・統計・白書</td><td><button class="toggle source-toggle on" data-source="官公庁"></button></td></tr>
               <tr><td>企業公式</td><td>無料公開情報</td><td>B</td><td>決算・事例・プレスリリース</td><td><button class="toggle source-toggle on" data-source="企業公式"></button></td></tr>
@@ -735,7 +751,9 @@
 
     function getEnabledSources() {
       const raw = localStorage.getItem("job-news-sources");
-      return raw ? JSON.parse(raw) : ["ITmedia", "JETRO", "官公庁", "企業公式", "リーディングカンパニー"];
+      if (!raw) return ["ITmedia", "Google News", "JETRO", "官公庁", "企業公式", "リーディングカンパニー"];
+      const parsed = JSON.parse(raw);
+      return parsed.includes("Google News") ? parsed : [...parsed, "Google News"];
     }
 
     function setEnabledSources(items) {
@@ -763,7 +781,6 @@
       const selectedSource = document.querySelector("#source-filter").value;
       const selectedTheme = document.querySelector("#theme-filter").value;
       const selectedMaterial = document.querySelector("#material-filter").value;
-      const keyword = document.querySelector("#keyword-filter").value.trim().toLowerCase();
       const enabled = getEnabledSources();
       let visibleCount = 0;
       document.querySelectorAll(".news-card").forEach((card) => {
@@ -772,8 +789,7 @@
         const materialOk = selectedMaterial === "すべての材料タイプ" || card.dataset.material === selectedMaterial;
         const activeOk = enabled.includes(card.dataset.source);
         const freshOk = Number(card.dataset.age) <= 7;
-        const keywordOk = !keyword || card.textContent.toLowerCase().includes(keyword);
-        const isVisible = sourceOk && themeOk && materialOk && activeOk && freshOk && keywordOk;
+        const isVisible = sourceOk && themeOk && materialOk && activeOk && freshOk;
         card.classList.toggle("hidden", !isVisible);
         if (isVisible) visibleCount += 1;
       });
@@ -784,14 +800,12 @@
     document.querySelector("#source-filter").addEventListener("change", applyFilters);
     document.querySelector("#theme-filter").addEventListener("change", applyFilters);
     document.querySelector("#material-filter").addEventListener("change", applyFilters);
-    document.querySelector("#keyword-filter").addEventListener("input", applyFilters);
     applyFilters();
 
     document.querySelector("#reset-filters").addEventListener("click", () => {
       document.querySelector("#source-filter").value = "すべての情報源";
       document.querySelector("#theme-filter").value = "すべてのテーマ";
       document.querySelector("#material-filter").value = "すべての材料タイプ";
-      document.querySelector("#keyword-filter").value = "";
       applyFilters();
     });
 
@@ -852,17 +866,92 @@
       return "別角度";
     }
 
-    function buildRelatedArticlesMarkup(candidates, currentUrl, currentTheme, currentMaterial) {
+    function buildCaseInsightMarkup(article) {
+      const text = `${article.title || ""} ${article.theme || ""} ${article.material || ""}`.toLowerCase();
+      let importance = "このニュースは、企業がどこにコストをかけ、どこで差別化しようとしているかを見る材料になります。";
+      let career = "就活では、企業理解やケース面接で「市場・顧客・競合・オペレーション」のどこに影響する話かを説明しやすくなります。";
+
+      if (text.includes("生成ai") || text.includes("ai") || text.includes("dx") || text.includes("llm")) {
+        importance = "AIの導入は、単なるツール利用ではなく、業務プロセス・人員配置・コスト構造の変化につながります。";
+        career = "ケース面接では、業務効率化、顧客体験、人材要件、既存サービスの置き換えを考える材料になります。";
+      } else if (text.includes("ev") || text.includes("自動車") || text.includes("電池") || text.includes("半導体")) {
+        importance = "自動車・半導体・電池は、投資額が大きく、供給網や量産体制が競争力を左右する業界です。";
+        career = "ケース面接では、参入障壁、サプライチェーン、価格戦略、インフラ整備を分解する練習になります。";
+      } else if (text.includes("金利") || text.includes("為替") || text.includes("物価") || text.includes("金融")) {
+        importance = "金利や為替の変化は、企業の投資判断、調達コスト、価格転嫁に広く影響します。";
+        career = "就活では、業界ごとの収益構造やコスト感応度を説明する材料として使えます。";
+      } else if (text.includes("物流") || text.includes("店舗") || text.includes("小売") || text.includes("価格") || text.includes("需要")) {
+        importance = "物流・店舗・価格のニュースは、現場のオペレーションが利益率や顧客体験に直結することを示します。";
+        career = "ケース面接では、売上を上げる施策だけでなく、在庫、配送、人員配置、単価を考える材料になります。";
+      } else if (text.includes("規制") || text.includes("政策") || text.includes("公取委") || text.includes("省")) {
+        importance = "公共ルールや制度変更は、企業の事業設計や取引条件を変える外部環境として重要です。";
+        career = "政治そのものではなく、規制が市場構造・参入障壁・企業行動をどう変えるかを見る材料になります。";
+      }
+
+      return `
+        <div class="case-insight">
+          <p><strong>なぜ重要か:</strong> ${escapeHtml(importance)}</p>
+          <p><strong>就活・ケースで使える理由:</strong> ${escapeHtml(career)}</p>
+        </div>
+      `;
+    }
+
+    function tokenizeTitle(title = "") {
+      const normalized = title
+        .toLowerCase()
+        .replace(/[「」『』【】（）()［\]\[\]、。，．・|｜:：!！?？]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const words = normalized.match(/[a-z0-9]+|[一-龠々ァ-ヶー]{2,}/g) || [];
+      return [...new Set(words.filter((word) => word.length >= 2))];
+    }
+
+    function inferTopicKey(title = "") {
+      const value = title.toLowerCase();
+      const rules = [
+        ["mobility", ["waymo", "自動運転", "ev", "自動車", "車", "タクシー", "ライドシェア", "uber"]],
+        ["game", ["任天堂", "switch", "ゲーム", "プレイ時間", "購入制限", "nintendo"]],
+        ["space", ["starlink", "amazon leo", "衛星", "宇宙", "通信"]],
+        ["media", ["dazn", "サブスク", "動画", "配信", "月額", "課金"]],
+        ["creator", ["kadokawa", "フリーランス", "ライター", "取引条件", "下請け"]],
+        ["ai", ["生成ai", "ai", "llm", "openai", "google", "microsoft"]],
+        ["finance", ["金利", "為替", "日銀", "銀行", "金融", "物価"]],
+        ["semiconductor", ["半導体", "tsmc", "rapidus", "intel", "nvidia"]],
+        ["retail", ["小売", "店舗", "消費", "価格", "物流"]]
+      ];
+      const found = rules.find(([, keywords]) => keywords.some((keyword) => value.includes(keyword)));
+      return found ? found[0] : "";
+    }
+
+    function relatedScore(base, candidate) {
+      if (!candidate.url || candidate.url === base.url) return 0;
+      const baseTopic = base.topicKey || inferTopicKey(base.title);
+      const candidateTopic = candidate.topicKey || inferTopicKey(candidate.title);
+      let score = 0;
+      if (baseTopic && candidateTopic && baseTopic === candidateTopic) score += 5;
+      if (base.theme && candidate.theme && base.theme === candidate.theme) score += 1;
+      if (base.material && candidate.material && base.material === candidate.material) score += 1;
+
+      const baseTokens = tokenizeTitle(base.title);
+      const candidateTokens = new Set(tokenizeTitle(candidate.title));
+      const overlap = baseTokens.filter((token) => candidateTokens.has(token));
+      score += overlap.length * 2;
+      return score;
+    }
+
+    function buildRelatedArticlesMarkup(candidates, currentArticle) {
       const related = candidates
-        .filter((item) => item.url && item.url !== currentUrl)
-        .filter((item) => item.theme === currentTheme || item.material === currentMaterial)
+        .map((item) => ({ ...item, score: relatedScore(currentArticle, item) }))
+        .filter((item) => item.score >= 4)
+        .sort((a, b) => b.score - a.score)
+        .filter((item) => item.url && item.url !== currentArticle.url)
         .slice(0, 3);
 
       if (related.length === 0) {
         return `
           <div class="related-item">
-            <strong>関連記事はまだありません</strong>
-            <span>同じテーマの記事を追加するか、「無料記事を探す」で候補を取得すると表示されます。</span>
+            <strong>関連度の高い記事はまだありません</strong>
+            <span>同じ企業・業界・論点の記事を追加するか、「無料記事を探す」で候補を増やすと表示されます。</span>
           </div>
         `;
       }
@@ -881,7 +970,8 @@
       const normalizedItems = items.map((item) => ({
         ...item,
         theme: item.theme || classifyTheme(item.title || ""),
-        material: item.material || classifyMaterial(item.title || "")
+        material: item.material || classifyMaterial(item.title || ""),
+        topicKey: item.topicKey || inferTopicKey(item.title || "")
       }));
 
       normalizedItems.forEach((item, index) => {
@@ -891,6 +981,7 @@
         const date = item.publishedAt || "";
         const theme = item.theme;
         const material = item.material;
+        const currentArticle = { title, url: link, theme, material, topicKey: item.topicKey || inferTopicKey(title) };
         const age = item.ageDays ?? daysFrom(date || new Date().toISOString());
         const noteId = `fetched-${index}-${Math.abs(title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0))}`;
         const article = document.createElement("article");
@@ -905,8 +996,9 @@
           <div class="tags"><span class="tag fresh">${freshnessLabel(age)}</span><span class="tag topic">${theme}</span><span class="tag">${material}</span></div>
           <div class="related">
             <p class="related-title">同じテーマの関連記事</p>
-            ${buildRelatedArticlesMarkup(normalizedItems, link, theme, material)}
+            ${buildRelatedArticlesMarkup(normalizedItems, currentArticle)}
           </div>
+          ${buildCaseInsightMarkup(currentArticle)}
           <div class="article-memo" data-note-id="${noteId}">
             <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
             <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
@@ -927,7 +1019,7 @@
 
     async function fetchFreeArticles() {
       const status = document.querySelector("#fetch-status");
-      status.textContent = "無料記事を探しています...";
+      status.textContent = "業界・ビジネス・オペレーション系の無料記事を探しています...";
       const endpoints = ["/api/articles", "/.netlify/functions/articles"];
       for (const endpoint of endpoints) {
         try {
@@ -936,13 +1028,13 @@
           const data = await response.json();
           const items = Array.isArray(data.articles) ? data.articles : [];
           renderFetchedArticles(items);
-          status.textContent = `${items.length}件の無料記事候補を表示しました。`;
+          status.textContent = `${items.length}件の無料記事候補を表示しました。もう一度押すと、別の候補が出ます。`;
           return;
         } catch {
           // Try next endpoint.
         }
       }
-      status.textContent = "無料記事取得APIに接続できませんでした。公開環境では /api/articles または Netlify Functions が必要です。";
+      status.textContent = "RSS取得に接続できませんでした。Vercel公開環境では /api/articles が必要です。";
     }
 
     function getManualArticles() {
@@ -962,7 +1054,8 @@
       const manualItems = getManualArticles().map((item) => ({
         ...item,
         theme: item.theme && item.theme !== "自動判定" ? item.theme : classifyTheme(item.title),
-        material: item.material && item.material !== "自動判定" ? item.material : classifyMaterial(item.title)
+        material: item.material && item.material !== "自動判定" ? item.material : classifyMaterial(item.title),
+        topicKey: inferTopicKey(item.title)
       }));
 
       manualItems.forEach((item, index) => {
@@ -970,6 +1063,7 @@
         const material = item.material && item.material !== "自動判定" ? item.material : classifyMaterial(item.title);
         const age = daysFrom(item.date || new Date().toISOString());
         const noteId = item.id || `manual-${index}`;
+        const currentArticle = { title: item.title, url: item.url, theme, material, topicKey: item.topicKey || inferTopicKey(item.title) };
         const article = document.createElement("article");
         article.className = "article news-card";
         article.dataset.source = item.source;
@@ -982,8 +1076,9 @@
           <div class="tags"><span class="tag fresh">${freshnessLabel(age)}</span><span class="tag topic">${theme}</span><span class="tag">${material}</span></div>
           <div class="related">
             <p class="related-title">同じテーマの関連記事</p>
-            ${buildRelatedArticlesMarkup(manualItems, item.url, theme, material)}
+            ${buildRelatedArticlesMarkup(manualItems, currentArticle)}
           </div>
+          ${buildCaseInsightMarkup(currentArticle)}
           <div class="article-memo" data-note-id="${noteId}">
             <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
             <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
