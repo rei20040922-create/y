@@ -174,6 +174,12 @@
       border: 1px solid #e5ece8;
       border-radius: 8px;
       background: #fbfcfb;
+      color: inherit;
+      text-decoration: none;
+    }
+    .related-item:hover {
+      border-color: #b9d9cd;
+      background: #f4faf7;
     }
     .related-item strong {
       font-size: 13px;
@@ -836,16 +842,55 @@
       }[char]));
     }
 
+    function inferRelatedAngle(title) {
+      const value = title.toLowerCase();
+      if (value.includes("規制") || value.includes("政策") || value.includes("法") || value.includes("政府")) return "政策側";
+      if (value.includes("投資") || value.includes("設備") || value.includes("提携") || value.includes("買収")) return "企業側";
+      if (value.includes("消費") || value.includes("顧客") || value.includes("価格") || value.includes("需要")) return "顧客側";
+      if (value.includes("人材") || value.includes("採用") || value.includes("働き方") || value.includes("スキル")) return "人材側";
+      if (value.includes("供給") || value.includes("物流") || value.includes("半導体") || value.includes("電池")) return "供給側";
+      return "別角度";
+    }
+
+    function buildRelatedArticlesMarkup(candidates, currentUrl, currentTheme, currentMaterial) {
+      const related = candidates
+        .filter((item) => item.url && item.url !== currentUrl)
+        .filter((item) => item.theme === currentTheme || item.material === currentMaterial)
+        .slice(0, 3);
+
+      if (related.length === 0) {
+        return `
+          <div class="related-item">
+            <strong>関連記事はまだありません</strong>
+            <span>同じテーマの記事を追加するか、「無料記事を探す」で候補を取得すると表示されます。</span>
+          </div>
+        `;
+      }
+
+      return related.map((item) => `
+        <a class="related-item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+          <strong>${inferRelatedAngle(item.title)}: ${escapeHtml(item.title)}</strong>
+          <span>${escapeHtml(item.source || "関連記事")} / ${escapeHtml(item.publishedAt || item.date || "公開日不明")}</span>
+        </a>
+      `).join("");
+    }
+
     function renderFetchedArticles(items) {
       const container = document.querySelector("#fetched-articles");
       container.innerHTML = "";
-      items.forEach((item, index) => {
+      const normalizedItems = items.map((item) => ({
+        ...item,
+        theme: item.theme || classifyTheme(item.title || ""),
+        material: item.material || classifyMaterial(item.title || "")
+      }));
+
+      normalizedItems.forEach((item, index) => {
         const title = item.title || "タイトルなし";
         const link = item.url || "#";
         const source = item.source || "無料記事";
         const date = item.publishedAt || "";
-        const theme = item.theme || classifyTheme(title);
-        const material = item.material || classifyMaterial(title);
+        const theme = item.theme;
+        const material = item.material;
         const age = item.ageDays ?? daysFrom(date || new Date().toISOString());
         const noteId = `fetched-${index}-${Math.abs(title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0))}`;
         const article = document.createElement("article");
@@ -859,10 +904,8 @@
           <h3><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
           <div class="tags"><span class="tag fresh">${freshnessLabel(age)}</span><span class="tag topic">${theme}</span><span class="tag">${material}</span></div>
           <div class="related">
-            <p class="related-title">同じテーマの別角度</p>
-            <div class="related-item"><strong>顧客側: 誰の行動や困りごとが変わるか</strong><span>需要を考える視点</span></div>
-            <div class="related-item"><strong>企業側: 収益・コスト・競争優位にどう効くか</strong><span>業界分析の視点</span></div>
-            <div class="related-item"><strong>外部環境: 政策・規制・技術変化とどうつながるか</strong><span>PESTに近い視点</span></div>
+            <p class="related-title">同じテーマの関連記事</p>
+            ${buildRelatedArticlesMarkup(normalizedItems, link, theme, material)}
           </div>
           <div class="article-memo" data-note-id="${noteId}">
             <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
@@ -916,7 +959,13 @@
     function renderManualArticles() {
       const container = document.querySelector("#manual-articles");
       container.innerHTML = "";
-      getManualArticles().forEach((item, index) => {
+      const manualItems = getManualArticles().map((item) => ({
+        ...item,
+        theme: item.theme && item.theme !== "自動判定" ? item.theme : classifyTheme(item.title),
+        material: item.material && item.material !== "自動判定" ? item.material : classifyMaterial(item.title)
+      }));
+
+      manualItems.forEach((item, index) => {
         const theme = item.theme && item.theme !== "自動判定" ? item.theme : classifyTheme(item.title);
         const material = item.material && item.material !== "自動判定" ? item.material : classifyMaterial(item.title);
         const age = daysFrom(item.date || new Date().toISOString());
@@ -932,10 +981,8 @@
           <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a></h3>
           <div class="tags"><span class="tag fresh">${freshnessLabel(age)}</span><span class="tag topic">${theme}</span><span class="tag">${material}</span></div>
           <div class="related">
-            <p class="related-title">同じテーマの別角度</p>
-            <div class="related-item"><strong>顧客側: 誰の行動や困りごとが変わるか</strong><span>需要を考える視点</span></div>
-            <div class="related-item"><strong>企業側: 収益・コスト・競争優位にどう効くか</strong><span>${item.angle ? `${escapeHtml(item.angle)}を中心に見る` : "業界分析の視点"}</span></div>
-            <div class="related-item"><strong>外部環境: 政策・規制・技術変化とどうつながるか</strong><span>PESTに近い視点</span></div>
+            <p class="related-title">同じテーマの関連記事</p>
+            ${buildRelatedArticlesMarkup(manualItems, item.url, theme, material)}
           </div>
           <div class="article-memo" data-note-id="${noteId}">
             <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
