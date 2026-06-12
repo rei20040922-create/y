@@ -1,0 +1,5 @@
+Case Material Desk v1.1.0
+Built: 2026-06-12
+Mode: Static local-first app with optional free article fetch API
+Automation: manual fetch only
+External paid APIs: none

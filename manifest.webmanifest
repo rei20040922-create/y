@@ -1,0 +1,19 @@
+{
+  "name": "Case Material Desk",
+  "short_name": "Case Desk",
+  "description": "ケース面接で使える無料記事・企業公式資料・公的情報を整理する材料管理アプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f7f4",
+  "theme_color": "#203033",
+  "lang": "ja",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

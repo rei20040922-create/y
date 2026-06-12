@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Case Material Desk</title>
+  <meta name="description" content="ケース面接で使える無料記事・企業公式資料・公的情報を整理する材料管理アプリ">
+  <meta name="theme-color" content="#203033">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <style>
+    body {
+      margin: 0;
+      background: #f6f7f4;
+      color: #1e2629;
+      font-family: Arial, "Yu Gothic", Meiryo, sans-serif;
+      line-height: 1.6;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100vh;
+    }
+    aside {
+      background: #203033;
+      color: #fff;
+      padding: 22px 16px;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .caption {
+      color: #becdca;
+      font-size: 12px;
+      margin-bottom: 22px;
+    }
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+    nav button {
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #e6eeee;
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+    nav button.active {
+      background: #315247;
+      color: #fff;
+    }
+    main {
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 24px;
+    }
+    .lead {
+      margin: 0 0 18px;
+      color: #677477;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .fetch-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .manual-form {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr 150px;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .manual-form .wide {
+      grid-column: 1 / -1;
+    }
+    .status-msg {
+      color: #677477;
+      font-size: 13px;
+    }
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .empty-state {
+      padding: 18px;
+      color: #677477;
+      background: #fbfcfb;
+      border-top: 1px solid #e8eeeb;
+    }
+    .utility-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    select, input, textarea {
+      width: 100%;
+      border: 1px solid #d9e0dc;
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      font: inherit;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid #d9e0dc;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(27, 37, 39, .08);
+    }
+    .panel h2 {
+      margin: 0;
+      padding: 14px 16px;
+      border-bottom: 1px solid #d9e0dc;
+      font-size: 16px;
+    }
+    .article {
+      padding: 16px;
+      border-bottom: 1px solid #d9e0dc;
+    }
+    .article:last-child {
+      border-bottom: 0;
+    }
+    .meta, .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #677477;
+      font-size: 12px;
+    }
+    .article h3 {
+      margin: 8px 0;
+      font-size: 17px;
+    }
+    .related {
+      margin-top: 12px;
+      border-top: 1px solid #e8eeeb;
+      padding-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .related-title {
+      margin: 0;
+      color: #677477;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .related-item {
+      display: grid;
+      gap: 2px;
+      padding: 10px;
+      border: 1px solid #e5ece8;
+      border-radius: 8px;
+      background: #fbfcfb;
+    }
+    .related-item strong {
+      font-size: 13px;
+    }
+    .related-item span {
+      color: #677477;
+      font-size: 12px;
+    }
+    .article-memo {
+      margin-top: 12px;
+      border-top: 1px solid #e8eeeb;
+      padding-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .article-memo textarea {
+      min-height: 64px;
+    }
+    .tag {
+      border-radius: 999px;
+      background: #eef3f1;
+      color: #405155;
+      padding: 3px 8px;
+    }
+    .fresh {
+      background: #e5f4ee;
+      color: #207357;
+    }
+    .topic {
+      background: #e8f0fb;
+      color: #275f9d;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn {
+      border: 1px solid #d9e0dc;
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+    .primary {
+      background: #207357;
+      color: #fff;
+      border-color: #207357;
+    }
+    .mini {
+      font-size: 12px;
+      padding: 5px 8px;
+    }
+    .toggle {
+      width: 44px;
+      height: 24px;
+      border: 0;
+      border-radius: 999px;
+      background: #c8d3d0;
+      position: relative;
+      cursor: pointer;
+    }
+    .toggle::after {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: .16s ease;
+    }
+    .toggle.on {
+      background: #207357;
+    }
+    .toggle.on::after {
+      transform: translateX(20px);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      background: #fff;
+      border: 1px solid #d9e0dc;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 24px;
+    }
+    .stat span {
+      color: #677477;
+      font-size: 12px;
+    }
+    .memo {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: #677477;
+      font-size: 13px;
+    }
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    th, td {
+      border-bottom: 1px solid #d9e0dc;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      color: #677477;
+      background: #fafbf9;
+    }
+    .hidden {
+      display: none;
+    }
+    @media (max-width: 860px) {
+      .layout, .grid {
+        grid-template-columns: 1fr;
+      }
+      .toolbar, .stats {
+        grid-template-columns: 1fr;
+      }
+      .manual-form {
+        grid-template-columns: 1fr;
+      }
+      aside {
+        position: static;
+        padding: 14px;
+      }
+      nav {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      nav button {
+        text-align: center;
+        padding: 9px 8px;
+      }
+      main {
+        padding: 16px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      .panel {
+        box-shadow: none;
+      }
+      .article {
+        padding: 14px;
+      }
+      .article h3 {
+        font-size: 16px;
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .actions .btn,
+      .actions select {
+        min-height: 40px;
+      }
+      th, td {
+        white-space: nowrap;
+      }
+    }
+    @media (max-width: 520px) {
+      .brand {
+        font-size: 16px;
+      }
+      .caption {
+        margin-bottom: 12px;
+      }
+      nav {
+        gap: 6px;
+      }
+      nav button {
+        font-size: 13px;
+      }
+      main {
+        padding: 12px;
+      }
+      .toolbar {
+        gap: 8px;
+      }
+      .actions {
+        grid-template-columns: 1fr;
+      }
+      .meta, .tags {
+        gap: 6px;
+      }
+      .tag {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">Case Material Desk</div>
+      <div class="caption">ケース面接の材料集め</div>
+      <nav>
+        <button class="active" data-view="today">材料登録</button>
+        <button data-view="saved">材料ストック</button>
+        <button data-view="sources">情報源設定</button>
+      </nav>
+    </aside>
+
+    <main>
+      <section id="today">
+        <h1>材料登録</h1>
+        <p class="lead">無料で読めるニュースや公開情報を中心に、ケース面接で考える材料を集める画面です。</p>
+        <div class="toolbar">
+          <select id="source-filter"><option>すべての情報源</option><option>ITmedia</option><option>JETRO</option><option>官公庁</option><option>企業公式</option><option>リーディングカンパニー</option><option>Nikkei</option><option>Reuters</option></select>
+          <select id="theme-filter"><option>すべてのテーマ</option><option>AI・テクノロジー</option><option>金融・金利・為替</option><option>国際情勢</option><option>メーカー・半導体</option></select>
+          <select id="material-filter"><option>すべての材料タイプ</option><option>業界知識</option><option>市場変化</option><option>企業事例</option><option>社会トレンド</option></select>
+          <input id="keyword-filter" placeholder="例: EV、AI、金利">
+        </div>
+        <div class="summary-row">
+          <span class="tag">表示中 <strong id="visible-count">0</strong> 件</span>
+          <span class="tag">保存済み <strong id="saved-count">0</strong> 件</span>
+          <span class="tag">手動登録 <strong id="manual-count">0</strong> 件</span>
+        </div>
+        <div class="utility-row">
+          <button type="button" class="btn" id="reset-filters">絞り込みを戻す</button>
+          <button type="button" class="btn" id="export-all">全データを書き出し</button>
+          <label class="btn" for="import-all" style="display:inline-flex;align-items:center;cursor:pointer">全データを読み込み</label>
+          <input id="import-all" type="file" accept="application/json" class="hidden">
+        </div>
+        <div class="fetch-bar">
+          <button type="button" class="btn primary" id="fetch-free-articles">無料記事を探す</button>
+          <span class="status-msg" id="fetch-status">見つけた無料記事・企業公式資料・公的情報を登録して、ケース面接の材料として育てるアプリです。</span>
+        </div>
+        <form class="manual-form" id="manual-article-form">
+          <select id="manual-source">
+            <option>ITmedia</option>
+            <option>JETRO</option>
+            <option>官公庁</option>
+            <option>企業公式</option>
+            <option>リーディングカンパニー</option>
+            <option>Nikkei</option>
+            <option>Reuters</option>
+            <option>その他</option>
+          </select>
+          <input id="manual-title" placeholder="見出しを入力">
+          <input id="manual-url" placeholder="記事URLを入力" type="url">
+          <input id="manual-date" type="date">
+          <select id="manual-theme">
+            <option>自動判定</option>
+            <option>AI・テクノロジー</option>
+            <option>金融・金利・為替</option>
+            <option>メーカー・半導体</option>
+            <option>国際情勢</option>
+            <option>経営戦略・M&A</option>
+            <option>人材・働き方</option>
+          </select>
+          <select id="manual-material">
+            <option>自動判定</option>
+            <option>業界知識</option>
+            <option>市場変化</option>
+            <option>企業事例</option>
+            <option>社会トレンド</option>
+          </select>
+          <input id="manual-company" placeholder="企業名・機関名 任意">
+          <input id="manual-angle" placeholder="見たい角度 例: 投資、価格戦略、規制">
+          <button type="submit" class="btn primary wide">材料を登録</button>
+        </form>
+        <div class="grid">
+          <section class="panel">
+            <h2>材料候補</h2>
+            <div id="fetched-articles"></div>
+            <div id="manual-articles"></div>
+            <article class="article news-card" data-source="官公庁" data-theme="金融・金利・為替" data-material="市場変化" data-age="0">
+              <div class="meta"><span>無料公開記事</span><span>サンプル</span><span>市場変化</span></div>
+              <h3>各国中銀の金利見通しに変化、企業の資金調達コストに影響</h3>
+              <div class="tags"><span class="tag fresh">24h</span><span class="tag topic">金融・金利・為替</span><span class="tag">市場変化</span></div>
+              <div class="related">
+                <p class="related-title">同じテーマの別角度</p>
+                <div class="related-item">
+                  <strong>消費者側: 住宅ローンや耐久財購入への影響</strong>
+                  <span>無料記事・公的統計 / 家計と消費の変化を見る</span>
+                </div>
+                <div class="related-item">
+                  <strong>企業側: 借入依存度が高い業界ほど投資判断が慎重に</strong>
+                  <span>無料公開記事 / 業界ごとの資金調達を見る</span>
+                </div>
+                <div class="related-item">
+                  <strong>金融側: 銀行の利ざや改善と貸倒リスクの両面</strong>
+                  <span>日銀・金融庁 / 金融機関の見方を足す</span>
+                </div>
+              </div>
+              <div class="article-memo" data-note-id="rates">
+                <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
+                <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
+                <label>ケースで使えそうな切り口<textarea data-field="angle" placeholder="市場規模、顧客、企業、規制などにつなげる"></textarea></label>
+                <div class="actions">
+                  <button type="button" class="btn mini generate-angle" data-note-id="rates">切り口を自動生成</button>
+                  <button type="button" class="btn mini save-article-note">メモを保存</button>
+                </div>
+              </div>
+              <div class="actions"><button class="btn primary save-article" data-title="各国中銀の金利見通しに変化、企業の資金調達コストに影響" data-source="官公庁" data-theme="金融・金利・為替" data-material="市場変化">材料として保存</button></div>
+            </article>
+            <article class="article news-card" data-source="ITmedia" data-theme="AI・テクノロジー" data-material="企業事例" data-age="1">
+              <div class="meta"><span>ITmedia</span><span>サンプル</span><span>企業事例</span></div>
+              <h3>生成AI導入で業務プロセスを再設計、企業の人材要件にも変化</h3>
+              <div class="tags"><span class="tag fresh">3days</span><span class="tag topic">AI・テクノロジー</span><span class="tag">企業事例</span></div>
+              <div class="related">
+                <p class="related-title">同じテーマの別角度</p>
+                <div class="related-item">
+                  <strong>人材側: 新卒に求められる力が作業力から設計力へ変わる</strong>
+                  <span>リクルートワークス / 働き方とスキルの視点</span>
+                </div>
+                <div class="related-item">
+                  <strong>経営側: AI導入はツール導入ではなく業務プロセス再設計</strong>
+                  <span>McKinsey / 組織変革の視点</span>
+                </div>
+                <div class="related-item">
+                  <strong>規制側: 生成AI利用時の情報管理とガバナンス</strong>
+                  <span>経産省・総務省 / ルール形成の視点</span>
+                </div>
+              </div>
+              <div class="article-memo" data-note-id="ai-work">
+                <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
+                <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
+                <label>ケースで使えそうな切り口<textarea data-field="angle" placeholder="市場規模、顧客、企業、規制などにつなげる"></textarea></label>
+                <div class="actions">
+                  <button type="button" class="btn mini generate-angle" data-note-id="ai-work">切り口を自動生成</button>
+                  <button type="button" class="btn mini save-article-note">メモを保存</button>
+                </div>
+              </div>
+              <div class="actions"><button class="btn primary save-article" data-title="生成AI導入で業務プロセスを再設計、企業の人材要件にも変化" data-source="ITmedia" data-theme="AI・テクノロジー" data-material="企業事例">材料として保存</button></div>
+            </article>
+            <article class="article news-card" data-source="JETRO" data-theme="メーカー・半導体" data-material="業界知識" data-age="2">
+              <div class="meta"><span>JETRO</span><span>サンプル</span><span>業界知識</span></div>
+              <h3>アジア地域でEV関連投資が拡大、部品供給網の再編が進む</h3>
+              <div class="tags"><span class="tag fresh">3days</span><span class="tag topic">メーカー・半導体</span><span class="tag">業界知識</span></div>
+              <div class="related">
+                <p class="related-title">同じテーマの別角度</p>
+                <div class="related-item">
+                  <strong>供給側: 電池・半導体・素材のボトルネック</strong>
+                  <span>JETRO / サプライチェーンの視点</span>
+                </div>
+                <div class="related-item">
+                  <strong>需要側: 充電インフラと価格が普及速度を左右</strong>
+                  <span>無料記事・企業公式 / 消費者とインフラの視点</span>
+                </div>
+                <div class="related-item">
+                  <strong>政策側: 補助金や関税で生産拠点が変わる</strong>
+                  <span>無料公開記事・官公庁 / 地政学と政策の視点</span>
+                </div>
+              </div>
+              <div class="article-memo" data-note-id="ev-supply">
+                <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
+                <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
+                <label>ケースで使えそうな切り口<textarea data-field="angle" placeholder="市場規模、顧客、企業、規制などにつなげる"></textarea></label>
+                <div class="actions">
+                  <button type="button" class="btn mini generate-angle" data-note-id="ev-supply">切り口を自動生成</button>
+                  <button type="button" class="btn mini save-article-note">メモを保存</button>
+                </div>
+              </div>
+              <div class="actions"><button class="btn primary save-article" data-title="アジア地域でEV関連投資が拡大、部品供給網の再編が進む" data-source="JETRO" data-theme="メーカー・半導体" data-material="業界知識">材料として保存</button></div>
+            </article>
+            <div id="empty-state" class="empty-state hidden">条件に合う材料がありません。キーワードや情報源を変えるか、上のフォームから材料を登録してください。</div>
+          </section>
+        </div>
+      </section>
+
+      <section id="saved" class="hidden">
+        <h1>材料ストック</h1>
+        <p class="lead">ケース面接で考えるための材料を、テーマや切り口ごとに整理します。</p>
+        <section class="panel">
+          <h2>保存した材料</h2>
+          <div class="fetch-bar" style="padding: 0 16px 14px">
+            <button type="button" class="btn" id="export-saved">保存材料を書き出し</button>
+            <button type="button" class="btn" id="clear-saved">保存材料を初期化</button>
+            <span class="status-msg" id="saved-status">ブラウザ内に保存されています。</span>
+          </div>
+          <div id="saved-list">
+            <article class="article">
+              <div class="meta"><span>業界知識</span><span>自動車・半導体</span></div>
+              <h3>EV供給網の再編を、市場規模推定と参入障壁の話につなげる</h3>
+            </article>
+            <article class="article">
+              <div class="meta"><span>社会トレンド</span><span>AI・働き方</span></div>
+              <h3>生成AIで新卒に求められる力がどう変わるか</h3>
+            </article>
+          </div>
+        </section>
+      </section>
+
+      <section id="sources" class="hidden">
+        <h1>情報源設定</h1>
+        <p class="lead">取得対象は最終的に自分でON/OFFできます。</p>
+        <section class="panel">
+          <h2>登録候補</h2>
+          <div class="table-wrap">
+          <table>
+            <thead><tr><th>情報源</th><th>種類</th><th>信頼</th><th>用途</th><th>取得</th></tr></thead>
+            <tbody>
+              <tr><td>ITmedia</td><td>無料ニュース</td><td>A</td><td>IT・AI・通信</td><td><button class="toggle source-toggle on" data-source="ITmedia"></button></td></tr>
+              <tr><td>JETRO</td><td>無料公開情報</td><td>A</td><td>海外ビジネス・貿易</td><td><button class="toggle source-toggle on" data-source="JETRO"></button></td></tr>
+              <tr><td>官公庁</td><td>無料公開情報</td><td>A</td><td>政策・統計・白書</td><td><button class="toggle source-toggle on" data-source="官公庁"></button></td></tr>
+              <tr><td>企業公式</td><td>無料公開情報</td><td>B</td><td>決算・事例・プレスリリース</td><td><button class="toggle source-toggle on" data-source="企業公式"></button></td></tr>
+              <tr><td>リーディングカンパニー</td><td>無料公開情報</td><td>B</td><td>業界トップ企業の打ち手・投資・戦略</td><td><button class="toggle source-toggle on" data-source="リーディングカンパニー"></button></td></tr>
+              <tr><td>Nikkei</td><td>有料系補助</td><td>B</td><td>関連記事・見出し参考</td><td><button class="toggle" disabled></button></td></tr>
+              <tr><td>Reuters</td><td>有料/制限あり補助</td><td>B</td><td>関連記事・見出し参考</td><td><button class="toggle" disabled></button></td></tr>
+            </tbody>
+          </table>
+          </div>
+        </section>
+        <section class="panel" style="margin-top:16px">
+          <h2>企業ソース候補</h2>
+          <div class="table-wrap">
+          <table>
+            <thead><tr><th>業界</th><th>企業例</th><th>見るもの</th><th>ケースで使える視点</th></tr></thead>
+            <tbody>
+              <tr><td>自動車</td><td>トヨタ、ホンダ、日産、Tesla</td><td>決算、EV投資、電池戦略</td><td>普及のボトルネック、収益構造、供給網</td></tr>
+              <tr><td>半導体</td><td>TSMC、Samsung、Intel、Rapidus</td><td>設備投資、技術ロードマップ</td><td>参入障壁、需要予測、地政学</td></tr>
+              <tr><td>IT・AI</td><td>Microsoft、Google、Amazon、OpenAI</td><td>導入事例、プロダクト発表</td><td>業務代替、価格戦略、エコシステム</td></tr>
+              <tr><td>小売</td><td>セブン、イオン、ユニクロ、Amazon</td><td>店舗戦略、物流、消費者施策</td><td>顧客体験、在庫、出店戦略</td></tr>
+              <tr><td>金融</td><td>三菱UFJ、三井住友、みずほ、SBI</td><td>決算、金利影響、DX施策</td><td>利ざや、手数料、リスク管理</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </section>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll("nav button");
+    const views = {
+      today: document.querySelector("#today"),
+      saved: document.querySelector("#saved"),
+      sources: document.querySelector("#sources")
+    };
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        buttons.forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        Object.values(views).forEach((view) => view.classList.add("hidden"));
+        views[button.dataset.view].classList.remove("hidden");
+      });
+    });
+
+    const savedList = document.querySelector("#saved-list");
+    const defaultSaved = [
+      {
+        title: "EV供給網の再編を、市場規模推定と参入障壁の話につなげる",
+        source: "メモ",
+        theme: "自動車・半導体",
+        material: "業界知識"
+      },
+      {
+        title: "生成AIで新卒に求められる力がどう変わるか",
+        source: "メモ",
+        theme: "AI・働き方",
+        material: "社会トレンド"
+      }
+    ];
+
+    function getSavedArticles() {
+      const raw = localStorage.getItem("job-news-saved");
+      return raw ? JSON.parse(raw) : defaultSaved;
+    }
+
+    function setSavedArticles(items) {
+      localStorage.setItem("job-news-saved", JSON.stringify(items));
+      renderSavedArticles();
+      updateCounts();
+    }
+
+    function renderSavedArticles() {
+      savedList.innerHTML = "";
+      getSavedArticles().forEach((item) => {
+        const article = document.createElement("article");
+        article.className = "article";
+        article.innerHTML = `
+          <div class="meta"><span>${item.material || item.use || "材料"}</span><span>${item.theme}</span><span>${item.source}</span></div>
+          <h3>${item.title}</h3>
+          ${item.company || item.angle ? `<p class="lead">${item.company ? `企業・機関: ${item.company}` : ""}${item.company && item.angle ? " / " : ""}${item.angle ? `見る角度: ${item.angle}` : ""}</p>` : ""}
+          <div class="actions">
+            <select class="material-change" data-title="${item.title}">
+              <option ${(item.material || item.use) === "業界知識" ? "selected" : ""}>業界知識</option>
+              <option ${(item.material || item.use) === "市場変化" ? "selected" : ""}>市場変化</option>
+              <option ${(item.material || item.use) === "企業事例" ? "selected" : ""}>企業事例</option>
+              <option ${(item.material || item.use) === "社会トレンド" ? "selected" : ""}>社会トレンド</option>
+              <option ${(item.material || item.use) === "あとで読む" ? "selected" : ""}>あとで読む</option>
+            </select>
+            <button class="btn mini remove-saved" data-title="${item.title}">削除</button>
+          </div>
+        `;
+        savedList.appendChild(article);
+      });
+    }
+
+    document.querySelectorAll(".save-article").forEach((button) => {
+      button.addEventListener("click", () => {
+        const items = getSavedArticles();
+        const title = button.dataset.title;
+        if (!items.some((item) => item.title === title)) {
+          items.unshift({
+            title,
+            source: button.dataset.source,
+            theme: button.dataset.theme,
+            material: button.dataset.material,
+            company: button.dataset.company || "",
+            angle: button.dataset.angle || ""
+          });
+          setSavedArticles(items);
+        }
+        button.textContent = "保存済み";
+      });
+    });
+
+    renderSavedArticles();
+
+    savedList.addEventListener("change", (event) => {
+      if (!event.target.classList.contains("material-change")) return;
+      const items = getSavedArticles().map((item) => {
+        if (item.title === event.target.dataset.title) {
+          return { ...item, material: event.target.value };
+        }
+        return item;
+      });
+      setSavedArticles(items);
+    });
+
+    savedList.addEventListener("click", (event) => {
+      if (!event.target.classList.contains("remove-saved")) return;
+      const items = getSavedArticles().filter((item) => item.title !== event.target.dataset.title);
+      setSavedArticles(items);
+    });
+
+    function getEnabledSources() {
+      const raw = localStorage.getItem("job-news-sources");
+      return raw ? JSON.parse(raw) : ["ITmedia", "JETRO", "官公庁", "企業公式", "リーディングカンパニー"];
+    }
+
+    function setEnabledSources(items) {
+      localStorage.setItem("job-news-sources", JSON.stringify(items));
+      applyFilters();
+    }
+
+    document.querySelectorAll(".source-toggle").forEach((button) => {
+      const enabled = getEnabledSources();
+      button.classList.toggle("on", enabled.includes(button.dataset.source));
+      button.addEventListener("click", () => {
+        const next = new Set(getEnabledSources());
+        if (next.has(button.dataset.source)) {
+          next.delete(button.dataset.source);
+          button.classList.remove("on");
+        } else {
+          next.add(button.dataset.source);
+          button.classList.add("on");
+        }
+        setEnabledSources([...next]);
+      });
+    });
+
+    function applyFilters() {
+      const selectedSource = document.querySelector("#source-filter").value;
+      const selectedTheme = document.querySelector("#theme-filter").value;
+      const selectedMaterial = document.querySelector("#material-filter").value;
+      const keyword = document.querySelector("#keyword-filter").value.trim().toLowerCase();
+      const enabled = getEnabledSources();
+      let visibleCount = 0;
+      document.querySelectorAll(".news-card").forEach((card) => {
+        const sourceOk = selectedSource === "すべての情報源" || card.dataset.source === selectedSource;
+        const themeOk = selectedTheme === "すべてのテーマ" || card.dataset.theme === selectedTheme;
+        const materialOk = selectedMaterial === "すべての材料タイプ" || card.dataset.material === selectedMaterial;
+        const activeOk = enabled.includes(card.dataset.source);
+        const freshOk = Number(card.dataset.age) <= 7;
+        const keywordOk = !keyword || card.textContent.toLowerCase().includes(keyword);
+        const isVisible = sourceOk && themeOk && materialOk && activeOk && freshOk && keywordOk;
+        card.classList.toggle("hidden", !isVisible);
+        if (isVisible) visibleCount += 1;
+      });
+      document.querySelector("#visible-count").textContent = String(visibleCount);
+      document.querySelector("#empty-state").classList.toggle("hidden", visibleCount !== 0);
+    }
+
+    document.querySelector("#source-filter").addEventListener("change", applyFilters);
+    document.querySelector("#theme-filter").addEventListener("change", applyFilters);
+    document.querySelector("#material-filter").addEventListener("change", applyFilters);
+    document.querySelector("#keyword-filter").addEventListener("input", applyFilters);
+    applyFilters();
+
+    document.querySelector("#reset-filters").addEventListener("click", () => {
+      document.querySelector("#source-filter").value = "すべての情報源";
+      document.querySelector("#theme-filter").value = "すべてのテーマ";
+      document.querySelector("#material-filter").value = "すべての材料タイプ";
+      document.querySelector("#keyword-filter").value = "";
+      applyFilters();
+    });
+
+    document.querySelector("#fetch-free-articles").addEventListener("click", fetchFreeArticles);
+
+    function updateCounts() {
+      document.querySelector("#saved-count").textContent = String(getSavedArticles().length);
+      document.querySelector("#manual-count").textContent = String(getManualArticles().length);
+    }
+
+    function classifyTheme(text) {
+      const value = text.toLowerCase();
+      if (value.includes("ev") || value.includes("電池") || value.includes("半導体") || value.includes("自動車")) return "メーカー・半導体";
+      if (value.includes("ai") || value.includes("生成ai") || value.includes("dx") || value.includes("llm")) return "AI・テクノロジー";
+      if (value.includes("金利") || value.includes("為替") || value.includes("物価") || value.includes("日銀")) return "金融・金利・為替";
+      if (value.includes("海外") || value.includes("米国") || value.includes("中国") || value.includes("欧州")) return "国際情勢";
+      return "AI・テクノロジー";
+    }
+
+    function classifyMaterial(text) {
+      const value = text.toLowerCase();
+      if (value.includes("事例") || value.includes("導入") || value.includes("発表")) return "企業事例";
+      if (value.includes("市場") || value.includes("拡大") || value.includes("変化")) return "市場変化";
+      if (value.includes("規制") || value.includes("政策") || value.includes("法")) return "社会トレンド";
+      return "業界知識";
+    }
+
+    function daysFrom(dateText) {
+      const date = new Date(dateText);
+      if (Number.isNaN(date.getTime())) return 999;
+      return Math.floor((Date.now() - date.getTime()) / 86400000);
+    }
+
+    function freshnessLabel(age) {
+      if (age <= 0) return "24h";
+      if (age <= 3) return "3days";
+      if (age <= 7) return "7days";
+      return "old";
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function renderFetchedArticles(items) {
+      const container = document.querySelector("#fetched-articles");
+      container.innerHTML = "";
+      items.forEach((item, index) => {
+        const title = item.title || "タイトルなし";
+        const link = item.url || "#";
+        const source = item.source || "無料記事";
+        const date = item.publishedAt || "";
+        const theme = item.theme || classifyTheme(title);
+        const material = item.material || classifyMaterial(title);
+        const age = item.ageDays ?? daysFrom(date || new Date().toISOString());
+        const noteId = `fetched-${index}-${Math.abs(title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0))}`;
+        const article = document.createElement("article");
+        article.className = "article news-card";
+        article.dataset.source = source;
+        article.dataset.theme = theme;
+        article.dataset.material = material;
+        article.dataset.age = String(age);
+        article.innerHTML = `
+          <div class="meta"><span>${escapeHtml(source)}</span><span>${date ? escapeHtml(date) : "公開日不明"}</span><span>無料記事候補</span></div>
+          <h3><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(title)}</a></h3>
+          <div class="tags"><span class="tag fresh">${freshnessLabel(age)}</span><span class="tag topic">${theme}</span><span class="tag">${material}</span></div>
+          <div class="related">
+            <p class="related-title">同じテーマの別角度</p>
+            <div class="related-item"><strong>顧客側: 誰の行動や困りごとが変わるか</strong><span>需要を考える視点</span></div>
+            <div class="related-item"><strong>企業側: 収益・コスト・競争優位にどう効くか</strong><span>業界分析の視点</span></div>
+            <div class="related-item"><strong>外部環境: 政策・規制・技術変化とどうつながるか</strong><span>PESTに近い視点</span></div>
+          </div>
+          <div class="article-memo" data-note-id="${noteId}">
+            <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
+            <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
+            <label>ケースで使えそうな切り口<textarea data-field="angle" placeholder="市場規模、顧客、企業、規制などにつなげる"></textarea></label>
+            <div class="actions">
+              <button type="button" class="btn mini generate-angle" data-note-id="${noteId}">切り口を自動生成</button>
+              <button type="button" class="btn mini save-article-note">メモを保存</button>
+            </div>
+          </div>
+          <div class="actions"><button class="btn primary save-article" data-title="${escapeHtml(title)}" data-source="${escapeHtml(source)}" data-theme="${theme}" data-material="${material}">材料として保存</button></div>
+        `;
+        container.appendChild(article);
+      });
+      bindDynamicArticleButtons(container);
+      loadArticleNotes();
+      applyFilters();
+    }
+
+    async function fetchFreeArticles() {
+      const status = document.querySelector("#fetch-status");
+      status.textContent = "無料記事を探しています...";
+      const endpoints = ["/api/articles", "/.netlify/functions/articles"];
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint);
+          if (!response.ok) continue;
+          const data = await response.json();
+          const items = Array.isArray(data.articles) ? data.articles : [];
+          renderFetchedArticles(items);
+          status.textContent = `${items.length}件の無料記事候補を表示しました。`;
+          return;
+        } catch {
+          // Try next endpoint.
+        }
+      }
+      status.textContent = "無料記事取得APIに接続できませんでした。公開環境では /api/articles または Netlify Functions が必要です。";
+    }
+
+    function getManualArticles() {
+      const raw = localStorage.getItem("job-news-manual-articles");
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function setManualArticles(items) {
+      localStorage.setItem("job-news-manual-articles", JSON.stringify(items));
+      renderManualArticles();
+      updateCounts();
+    }
+
+    function renderManualArticles() {
+      const container = document.querySelector("#manual-articles");
+      container.innerHTML = "";
+      getManualArticles().forEach((item, index) => {
+        const theme = item.theme && item.theme !== "自動判定" ? item.theme : classifyTheme(item.title);
+        const material = item.material && item.material !== "自動判定" ? item.material : classifyMaterial(item.title);
+        const age = daysFrom(item.date || new Date().toISOString());
+        const noteId = item.id || `manual-${index}`;
+        const article = document.createElement("article");
+        article.className = "article news-card";
+        article.dataset.source = item.source;
+        article.dataset.theme = theme;
+        article.dataset.material = material;
+        article.dataset.age = String(age);
+        article.innerHTML = `
+          <div class="meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.date || "日付未設定")}</span><span>手動登録</span>${item.company ? `<span>${escapeHtml(item.company)}</span>` : ""}</div>
+          <h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a></h3>
+          <div class="tags"><span class="tag fresh">${freshnessLabel(age)}</span><span class="tag topic">${theme}</span><span class="tag">${material}</span></div>
+          <div class="related">
+            <p class="related-title">同じテーマの別角度</p>
+            <div class="related-item"><strong>顧客側: 誰の行動や困りごとが変わるか</strong><span>需要を考える視点</span></div>
+            <div class="related-item"><strong>企業側: 収益・コスト・競争優位にどう効くか</strong><span>${item.angle ? `${escapeHtml(item.angle)}を中心に見る` : "業界分析の視点"}</span></div>
+            <div class="related-item"><strong>外部環境: 政策・規制・技術変化とどうつながるか</strong><span>PESTに近い視点</span></div>
+          </div>
+          <div class="article-memo" data-note-id="${noteId}">
+            <label>この記事の要約<textarea data-field="summary" placeholder="この記事の要点を自分の言葉で書く"></textarea></label>
+            <label>自分の意見<textarea data-field="opinion" placeholder="気になる点、賛成・反対、就活生目線の考えを書く"></textarea></label>
+            <label>ケースで使えそうな切り口<textarea data-field="angle" placeholder="市場規模、顧客、企業、規制などにつなげる"></textarea></label>
+            <div class="actions">
+              <button type="button" class="btn mini generate-angle" data-note-id="${noteId}">切り口を自動生成</button>
+              <button type="button" class="btn mini save-article-note">メモを保存</button>
+              <button type="button" class="btn mini remove-manual" data-id="${noteId}">削除</button>
+            </div>
+          </div>
+          <div class="actions"><button class="btn primary save-article" data-title="${escapeHtml(item.title)}" data-source="${escapeHtml(item.source)}" data-theme="${theme}" data-material="${material}" data-company="${escapeHtml(item.company || "")}" data-angle="${escapeHtml(item.angle || "")}">材料として保存</button></div>
+        `;
+        container.appendChild(article);
+      });
+      bindDynamicArticleButtons(container);
+      loadArticleNotes();
+      applyFilters();
+    }
+
+    document.querySelector("#manual-article-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const title = document.querySelector("#manual-title").value.trim();
+      const url = document.querySelector("#manual-url").value.trim();
+      const date = document.querySelector("#manual-date").value;
+      const source = document.querySelector("#manual-source").value;
+      const theme = document.querySelector("#manual-theme").value;
+      const material = document.querySelector("#manual-material").value;
+      const company = document.querySelector("#manual-company").value.trim();
+      const angle = document.querySelector("#manual-angle").value.trim();
+      if (!title || !url) return;
+      try {
+        new URL(url);
+      } catch {
+        document.querySelector("#fetch-status").textContent = "URLの形式を確認してください。";
+        return;
+      }
+      const items = getManualArticles();
+      items.unshift({
+        id: `manual-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        title,
+        url,
+        date,
+        source,
+        theme,
+        material,
+        company,
+        angle
+      });
+      setManualArticles(items);
+      event.target.reset();
+      document.querySelector("#manual-date").valueAsDate = new Date();
+    });
+
+    document.querySelector("#manual-date").valueAsDate = new Date();
+
+    function downloadJson(fileName, payload) {
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.querySelector("#export-saved").addEventListener("click", () => {
+      downloadJson("job-news-saved-materials.json", getSavedArticles());
+      document.querySelector("#saved-status").textContent = "保存材料を書き出しました。";
+    });
+
+    document.querySelector("#clear-saved").addEventListener("click", () => {
+      localStorage.removeItem("job-news-saved");
+      renderSavedArticles();
+      updateCounts();
+      document.querySelector("#saved-status").textContent = "保存材料を初期状態に戻しました。";
+    });
+
+    function getAllData() {
+      return {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        savedArticles: getSavedArticles(),
+        manualArticles: getManualArticles(),
+        articleNotes: getArticleNotes(),
+        enabledSources: getEnabledSources()
+      };
+    }
+
+    document.querySelector("#export-all").addEventListener("click", () => {
+      downloadJson("job-news-desk-backup.json", getAllData());
+      document.querySelector("#fetch-status").textContent = "全データを書き出しました。";
+    });
+
+    document.querySelector("#import-all").addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (Array.isArray(data.savedArticles)) localStorage.setItem("job-news-saved", JSON.stringify(data.savedArticles));
+        if (Array.isArray(data.manualArticles)) localStorage.setItem("job-news-manual-articles", JSON.stringify(data.manualArticles));
+        if (data.articleNotes && typeof data.articleNotes === "object") localStorage.setItem("job-news-article-notes", JSON.stringify(data.articleNotes));
+        if (Array.isArray(data.enabledSources)) localStorage.setItem("job-news-sources", JSON.stringify(data.enabledSources));
+        renderSavedArticles();
+        renderManualArticles();
+        loadArticleNotes();
+        updateCounts();
+        applyFilters();
+        document.querySelector("#fetch-status").textContent = "全データを読み込みました。";
+      } catch {
+        document.querySelector("#fetch-status").textContent = "読み込みに失敗しました。JSONファイルを確認してください。";
+      } finally {
+        event.target.value = "";
+      }
+    });
+
+    function getArticleNotes() {
+      const raw = localStorage.getItem("job-news-article-notes");
+      return raw ? JSON.parse(raw) : {};
+    }
+
+    function setArticleNotes(notes) {
+      localStorage.setItem("job-news-article-notes", JSON.stringify(notes));
+    }
+
+    function loadArticleNotes() {
+      const notes = getArticleNotes();
+      document.querySelectorAll(".article-memo").forEach((memo) => {
+        const note = notes[memo.dataset.noteId] || {};
+        memo.querySelectorAll("textarea").forEach((textarea) => {
+          textarea.value = note[textarea.dataset.field] || "";
+        });
+      });
+    }
+
+    document.querySelectorAll(".save-article-note").forEach((button) => {
+      button.addEventListener("click", () => {
+        const memo = button.closest(".article-memo");
+        const notes = getArticleNotes();
+        const next = {};
+        memo.querySelectorAll("textarea").forEach((textarea) => {
+          next[textarea.dataset.field] = textarea.value;
+        });
+        notes[memo.dataset.noteId] = next;
+        setArticleNotes(notes);
+        button.textContent = "保存しました";
+      });
+    });
+
+    const angleTemplates = {
+      rates: "このニュースは、金利上昇が企業の投資判断や消費者の購買行動にどう影響するかを考える材料になる。ケースでは「資金調達コストが上がったとき、どの業界の利益率が下がりやすいか」「価格転嫁できる企業とできない企業の違いは何か」という切り口で使える。",
+      "ai-work": "このニュースは、生成AIによって業務プロセスと人材要件がどう変わるかを考える材料になる。ケースでは「AI導入で削減できる工程はどこか」「人間が残すべき価値は何か」「導入コストと効果をどう測るか」という切り口で使える。",
+      "ev-supply": "このニュースは、EV市場を需要だけでなく供給網から考える材料になる。ケースでは「普及のボトルネックは電池、半導体、充電インフラのどこか」「政策や関税で生産拠点がどう変わるか」「完成車メーカーと部品メーカーのどちらに利益が残るか」という切り口で使える。"
+    };
+
+    function bindDynamicArticleButtons(root) {
+      root.querySelectorAll(".save-article").forEach((button) => {
+        button.addEventListener("click", () => {
+          const items = getSavedArticles();
+          const title = button.dataset.title;
+          if (!items.some((item) => item.title === title)) {
+            items.unshift({
+              title,
+              source: button.dataset.source,
+              theme: button.dataset.theme,
+              material: button.dataset.material,
+              company: button.dataset.company || "",
+              angle: button.dataset.angle || ""
+            });
+            setSavedArticles(items);
+          }
+          button.textContent = "保存済み";
+        });
+      });
+
+      root.querySelectorAll(".save-article-note").forEach((button) => {
+        button.addEventListener("click", () => {
+          const memo = button.closest(".article-memo");
+          const notes = getArticleNotes();
+          const next = {};
+          memo.querySelectorAll("textarea").forEach((textarea) => {
+            next[textarea.dataset.field] = textarea.value;
+          });
+          notes[memo.dataset.noteId] = next;
+          setArticleNotes(notes);
+          button.textContent = "保存しました";
+        });
+      });
+
+      root.querySelectorAll(".generate-angle").forEach((button) => {
+        button.addEventListener("click", () => {
+          const memo = document.querySelector(`.article-memo[data-note-id="${button.dataset.noteId}"]`);
+          const angle = memo.querySelector('textarea[data-field="angle"]');
+          angle.value = angleTemplates[button.dataset.noteId] || "このニュースを、顧客・市場・競合・コスト・規制のどこに影響する話かに分解すると、ケース面接で使いやすい材料になる。";
+          button.textContent = "生成しました";
+        });
+      });
+
+      root.querySelectorAll(".remove-manual").forEach((button) => {
+        button.addEventListener("click", () => {
+          const items = getManualArticles().filter((item) => item.id !== button.dataset.id);
+          setManualArticles(items);
+        });
+      });
+    }
+
+    document.querySelectorAll(".generate-angle").forEach((button) => {
+      button.addEventListener("click", () => {
+        const memo = document.querySelector(`.article-memo[data-note-id="${button.dataset.noteId}"]`);
+        const angle = memo.querySelector('textarea[data-field="angle"]');
+        angle.value = angleTemplates[button.dataset.noteId] || "このニュースを、顧客・市場・競合・コスト・規制のどこに影響する話かに分解すると、ケース面接で使いやすい材料になる。";
+        button.textContent = "生成しました";
+      });
+    });
+
+    loadArticleNotes();
+    renderManualArticles();
+    updateCounts();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
